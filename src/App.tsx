@@ -7,11 +7,12 @@ import { Header } from './components/Header';
 import { TodoList } from './components/ToDoList';
 import cn from 'classnames';
 import { ErrorType } from './types/Error';
+import { Status } from './types/Status';
 
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodoTitle, setNewTodoTitle] = useState('');
-  const [filter, setFilter] = useState('All');
+  const [filter, setFilter] = useState<Status>(Status.ALL);
   const [errorMessage, setErrorMessage] = useState('');
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [todosAreLoadingIds, setTodosAreLoadingIds] = useState<number[]>([]);
@@ -106,11 +107,11 @@ export const App: React.FC = () => {
 
   const filteredTodos = useMemo(() => {
     return todos.filter(todo => {
-      if (filter === 'active') {
+      if (filter === Status.ACTIVE) {
         return !todo.completed;
       }
 
-      if (filter === 'completed') {
+      if (filter === Status.COMPLETED) {
         return todo.completed;
       }
 
@@ -217,7 +218,7 @@ export const App: React.FC = () => {
             resolve(true);
           })
           .catch(() => {
-            setErrorMessage('Не удалось удалить задачу');
+            setErrorMessage(ErrorType.DELETE_TODO);
             hideErrorMessage();
             resolve(false);
           })

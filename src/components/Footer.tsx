@@ -1,12 +1,19 @@
 import React from 'react';
 import { Todo } from '../types/Todo';
 import cn from 'classnames';
+import { Status } from '../types/Status';
 
 type Props = {
   todos: Todo[];
-  onFilter: React.Dispatch<React.SetStateAction<string>>;
+  onFilter: React.Dispatch<React.SetStateAction<Status>>;
   filter: string;
   handleDeleteAllCompleted: (currentsTodo: number[]) => void;
+};
+
+const statusLabels = {
+  [Status.ALL]: 'All',
+  [Status.ACTIVE]: 'Active',
+  [Status.COMPLETED]: 'Completed',
 };
 
 export const Footer: React.FC<Props> = ({
@@ -19,39 +26,26 @@ export const Footer: React.FC<Props> = ({
     .filter(todo => todo.completed)
     .map(todo => todo.id);
 
+  const remainingTodos = todos.filter(todo => !todo.completed).length;
+
   return (
     <footer className="todoapp__footer" data-cy="Footer">
       <span className="todo-count" data-cy="TodosCounter">
-        {todos.filter(todo => !todo.completed).length} items left
+        {remainingTodos} items left
       </span>
 
       <nav className="filter" data-cy="Filter">
-        <a
-          href="#/"
-          className={cn('filter__link', { selected: filter === 'All' })}
-          data-cy="FilterLinkAll"
-          onClick={() => onFilter('All')}
-        >
-          All
-        </a>
-
-        <a
-          href="#/active"
-          className={cn('filter__link', { selected: filter === 'active' })}
-          data-cy="FilterLinkActive"
-          onClick={() => onFilter('active')}
-        >
-          Active
-        </a>
-
-        <a
-          href="#/completed"
-          className={cn('filter__link', { selected: filter === 'completed' })}
-          data-cy="FilterLinkCompleted"
-          onClick={() => onFilter('completed')}
-        >
-          Completed
-        </a>
+        {Object.values(Status).map(status => (
+          <a
+            key={status}
+            href={`#/${status === Status.ALL ? '' : status}`}
+            className={cn('filter__link', { selected: filter === status })}
+            data-cy={`FilterLink${statusLabels[status]}`}
+            onClick={() => onFilter(status)}
+          >
+            {statusLabels[status]}
+          </a>
+        ))}
       </nav>
       <button
         type="button"
